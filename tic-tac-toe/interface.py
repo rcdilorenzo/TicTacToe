@@ -10,17 +10,15 @@ PALETTE = [
 ]
 
 def setup(epochs):
-    (screen, ui) = training_screen(epochs)
+    (screen, ui) = _training_screen(epochs)
     return (uw.MainLoop(screen, PALETTE), ui)
 
 # @mutates
 def train_cycle_finished(loop, ui):
     ui[PROGRESS].add_progress(1)
-    draw(loop)
+    _draw(loop)
 
-# Private Functions
-
-def training_screen(epochs):
+def _training_screen(epochs):
     title = uw.Text(u"Tic-Tac-Toe Reinforcement Learning", align = 'center')
     progress = TimedProgressBar('normal', 'complete', units = 'epochs',
                                 label = 'Training', done = epochs)
@@ -29,5 +27,5 @@ def training_screen(epochs):
     return (screen, { PROGRESS: progress })
 
 # @mutates
-def draw(loop):
+def _draw(loop):
     loop.draw_screen()
