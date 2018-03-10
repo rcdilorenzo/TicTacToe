@@ -22,7 +22,15 @@ def setup():
 
 def run(loop, ui):
     rewards_state = _train(loop, ui)
-    _play_games(loop, rewards_state)
+    play_game(loop, rewards_state)
+
+# @mutates
+def play_game(loop, rewards_state):
+    lookupR = autocurry(rewards.lookupR)(rewards_state)
+    state = State(rewards_state, agent.player(X, lookupR), board.empty())
+
+    move_selected = autocurry(_move_selected)(state)
+    interface.setup_game_play(loop, state, move_selected)
 
 def _train(loop, ui):
     # Setup shared rewards
@@ -43,20 +51,15 @@ def _train(loop, ui):
         # Increment progress
         interface.train_epoch_finished(loop, ui)
 
+    # @mutates - log to tsv file
+    rewards.log(rewards_state)
+
     return rewards_state
 
 # @mutates
-def _play_games(loop, rewards_state):
-    lookupR = autocurry(rewards.lookupR)(rewards_state)
-    state = State(rewards_state, agent.player(X, lookupR), board.empty())
-
-    move_selected = autocurry(_move_selected)(state)
-    interface.setup_game_play(loop, state, move_selected)
-
-# @mutates
 def _move_selected(state, button, move):
-    if button in [X, O]:
-        return None
+    if button.get_label() in [X, O]:
+        return interface.set_invalid_move_state()
 
     state.board_state = board.place(state.board_state, O, move)
     interface.update_board(state)
@@ -69,6 +72,9 @@ def _move_selected(state, button, move):
             state.agent_state.identifier,
             agent.move(state.agent_state, state.board_state))
         interface.update_board(state)
+
+    if board.is_finished(state.board_state):
+        interface.game_finished(state)
 
 # @mutates
 def _play_training_game(controller1, player1, controller2, player2):

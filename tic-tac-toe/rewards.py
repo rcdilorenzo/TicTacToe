@@ -27,13 +27,15 @@ def backupR(state, board_state, reward, identifier, alpha):
 
 def log(state):
     raw = state.value
-    print(join(map(lambda k: k + ": " + str(raw[k]) + "\n", raw)))
+    result = join(map(lambda k: k + "\t" + str(raw[k]) + "\n", raw))
+    with open('rewards.tsv', 'w') as f:
+        f.write(result)
 
 def _value(board_state, identifier):
     finished = board.is_finished(board_state)
     if finished == False:
         # Basic actions start with no reward
-        return 0
+        return -1
     elif board.is_win(board_state, identifier):
         # Winning has a high reward
         return 1.0

@@ -1,4 +1,4 @@
-from pyrsistent import PClass, field, m
+from pyrsistent import PClass, field
 from phi import Pipe, Then, Then3
 import random as rand
 
@@ -21,21 +21,31 @@ def player(identifier, lookupR):
         identifier = identifier,
         backupR = lambda _p, _r, _i, _a: None,  # Do not update rewards
         lookupR = lookupR,
-        epsilon = EPSILON,
+        epsilon = 0,
         alpha = ALPHA
     )
 
 def learner(identifier, lookupR, backupR):
-    return player(identifier, lookupR).set(backupR = backupR)
-
-def random(identifier, lookupR, backupR):
-    return learner(identifier, lookupR, backupR).set(epsilon = 0)
+    return player(identifier, lookupR).set(
+        epsilon = EPSILON,
+        backupR = backupR
+    )
 
 def move(state, board_state):
     if rand.random() < state.epsilon:
         return _random_move(state, board_state)
     else:
         return _greedy_move(state, board_state)
+
+def reward_matrix(state, board_state):
+    return reduce(
+        # Accumulate board with reward for each move
+        lambda acc, m: board.place(
+            acc, "{0:.2f}".format(_reward_for_move(state, board_state, m)), m),
+        # Get available moves
+        board_move.available(board_state),
+        # Use board as initial state
+        board_state).value
 
 def _random_move(_state, board_state):
     return Pipe(board_state, board_move.available, rand.choice)

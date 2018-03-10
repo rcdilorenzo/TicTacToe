@@ -17,7 +17,12 @@ def empty():
         [_EMPTY, _EMPTY, _EMPTY],
         [_EMPTY, _EMPTY, _EMPTY],
         [_EMPTY, _EMPTY, _EMPTY]
-    ]))
+    ], dtype = '<S5'))
+
+def not_id(identifier):
+    if identifier == X:   return O
+    elif identifier == O: return X
+    else:                 return _EMPTY
 
 def at(state, index):
     row = index / 3
