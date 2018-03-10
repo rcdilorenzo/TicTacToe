@@ -20,6 +20,13 @@ To run, simply call `python tic-tac-toe` from within the directory.
 
 <a href="https://asciinema.org/a/168616?t=1:05" target="_blank"><img src="https://asciinema.org/a/168616.png" width="50%" /></a>
 
+## Diagram Flow
+
+In case you're a lover of flow charts and sequence diagrams, here's a quick sketch of the program flow from the top-level.
+
+<img src="https://user-images.githubusercontent.com/634167/37247367-b2b2d7a0-2487-11e8-9266-9344d8237db0.png" height="700" />
+
+
 ## FAQ
 
 1. Why does the "AI Brain" section seem to show the initial values?
