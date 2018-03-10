@@ -19,7 +19,7 @@ def empty():
         [_EMPTY, _EMPTY, _EMPTY]
     ]))
 
-def hash(state):
+def hash_key(state):
     return join(map(str, list(state.value.flat)))
 
 def available(state):
@@ -40,11 +40,11 @@ def is_win(state, identifier):
     ]
     return any(Then(_is_slice_win, identifier), slices)
 
-def place(state, identifier, row, column):
+def place(state, identifier, move):
     # Immutably update board state
     matrix = np.copy(state.value)
-    if matrix[row, column] == _EMPTY:
-        matrix[row, column] = identifier
+    if matrix[move.row, move.column] == _EMPTY:
+        matrix[move.row, move.column] = identifier
     return state.set(value = matrix)
 
 def _is_slice_win(state_slice, identifier):
