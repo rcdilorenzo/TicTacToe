@@ -34,7 +34,7 @@ def is_empty(state):
     return Pipe(state, available, np.all)
 
 def is_finished(state):
-    return np.all(state.value != _EMPTY)
+    return np.all(state.value != _EMPTY) or is_win(state, X) or is_win(state, O)
 
 def is_win(state, identifier):
     matrix = state.value

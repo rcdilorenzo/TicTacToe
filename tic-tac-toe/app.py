@@ -7,7 +7,7 @@ import agent
 import board
 import rewards
 
-EPOCHS = 100
+EPOCHS = 10000
 REWARDS = 'rewards'
 
 class State:
