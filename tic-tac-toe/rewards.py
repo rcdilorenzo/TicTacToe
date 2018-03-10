@@ -8,7 +8,7 @@ class State(PClass):
 def empty():
     return State(value = dict())
 
-# @mutable
+# @mutates
 def lookupR(state, board_state, identifier):
     return state.value.get(
         # Use board key
@@ -16,7 +16,7 @@ def lookupR(state, board_state, identifier):
         # Ensure default reward added
         _value(board_state, identifier))
 
-# @mutable
+# @mutates
 def backupR(state, board_state, reward, identifier, alpha):
     if board.is_empty(board_state) == False:
         key = board.hash_key(board_state)

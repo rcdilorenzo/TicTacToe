@@ -1,26 +1,36 @@
-import time
+from pyrsistent import PClass, field
 from funcy import autocurry
+from board import X, O
+import time
 import interface
 import agent
 import board
 import rewards
 
-EPOCHS = 10000
+EPOCHS = 100
+REWARDS = 'rewards'
+
+class State:
+    def __init__(self, rewards_state, agent_state, board_state):
+        self.rewards_state = rewards_state
+        self.agent_state = agent_state
+        self.board_state = board_state
+        self.ui = {}
 
 def setup():
-    (loop, ui) = interface.setup(EPOCHS)
-    return (loop, ui, {})
+    return interface.setup(EPOCHS)
 
-def run(loop, ui, state):
-    train(loop, ui, state)
+def run(loop, ui):
+    rewards_state = _train(loop, ui)
+    _play_games(loop, rewards_state)
 
-def train(loop, ui, state):
+def _train(loop, ui):
     # Setup shared rewards
-    state = rewards.empty()
+    rewards_state = rewards.empty()
 
     # Curry functions to refer to shared rewards state
-    lookupR = autocurry(rewards.lookupR)(state)
-    backupR = autocurry(rewards.backupR)(state)
+    lookupR = autocurry(rewards.lookupR)(rewards_state)
+    backupR = autocurry(rewards.backupR)(rewards_state)
 
     for _ in range(0, EPOCHS):
         # Create agents to train against each other
@@ -28,41 +38,65 @@ def train(loop, ui, state):
         player2 = agent.learner(board.O, lookupR, backupR)
 
         # Play game
-        result = play_game(agent, player1, agent, player2)
+        result = _play_training_game(agent, player1, agent, player2)
 
         # Increment progress
-        interface.train_cycle_finished(loop, ui)
+        interface.train_epoch_finished(loop, ui)
 
-    rewards.log(state)
+    return rewards_state
 
-# @mutable
-def play_game(controller1, player1, controller2, player2):
+# @mutates
+def _play_games(loop, rewards_state):
+    lookupR = autocurry(rewards.lookupR)(rewards_state)
+    state = State(rewards_state, agent.player(X, lookupR), board.empty())
+
+    move_selected = autocurry(_move_selected)(state)
+    interface.setup_game_play(loop, state, move_selected)
+
+# @mutates
+def _move_selected(state, button, move):
+    if button in [X, O]:
+        return None
+
+    state.board_state = board.place(state.board_state, O, move)
+    interface.update_board(state)
+
+    if board.is_finished(state.board_state):
+        interface.game_finished(state)
+    else:
+        state.board_state = board.place(
+            state.board_state,
+            state.agent_state.identifier,
+            agent.move(state.agent_state, state.board_state))
+        interface.update_board(state)
+
+# @mutates
+def _play_training_game(controller1, player1, controller2, player2):
     # Initialize empty board
     board_state = board.empty()
 
     while board.is_finished(board_state) == False:
         # Player 1 turn
-        board_state = play(controller1, player1, board_state)
+        board_state = _play(controller1, player1, board_state)
 
         # Break if game already finished
         if board.is_finished(board_state): break
 
         # Player 2 turn
-        board_state = play(controller2, player2, board_state)
+        board_state = _play(controller2, player2, board_state)
 
     # Return game winner
-    return winner(board_state, player1, player2)
+    return _winner(board_state, player1, player2)
 
-# @mutable
-def play(controller, player, board_state):
+# @mutates
+def _play(controller, player, board_state):
     move = controller.move(player, board_state)
     return board.place(board_state, player.identifier, move)
 
-def winner(board_state, player1, player2):
+def _winner(board_state, player1, player2):
     if board.is_win(board_state, player1.identifier):
         return player1
     elif board.is_win(board_state, player2.identifier):
         return player2
     else:
         return None
-    

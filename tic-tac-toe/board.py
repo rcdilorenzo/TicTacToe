@@ -19,6 +19,11 @@ def empty():
         [_EMPTY, _EMPTY, _EMPTY]
     ]))
 
+def at(state, index):
+    row = index / 3
+    column = index % 3
+    return state.value[row, column]
+
 def hash_key(state):
     return join(map(str, list(state.value.flat)))
 

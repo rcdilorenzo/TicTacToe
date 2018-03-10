@@ -40,7 +40,7 @@ def move(state, board_state):
 def _random_move(_state, board_state):
     return Pipe(board_state, board_move.available, rand.choice)
 
-# @mutable
+# @mutates
 def _greedy_move(state, board_state):
     # Get available moves
     moves = board_move.available(board_state)
