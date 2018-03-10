@@ -1,5 +1,6 @@
 import urwid as uw
 import sys
+import tabulate
 from urwid_timed_progress import TimedProgressBar
 from tabulate import tabulate
 
@@ -45,10 +46,11 @@ def update_board(app_state):
         buttons[i].set_label(board.at(board_state, i))
 
     reward_matrix = agent.reward_matrix(app_state.agent_state, board_state)
-    description = tabulate(reward_matrix, tablefmt = 'fancy_grid')
-    app_state.ui[AI_DESCRIPTION].set_text(description)
+    text = tabulate(reward_matrix, floatfmt = '.3f', tablefmt = 'fancy_grid')
+    app_state.ui[AI_DESCRIPTION].set_text(text)
 
     app_state.ui[STATUS].set_text('Status: Your Move')
+    _draw(app_state.ui[LOOP])
 
 # @mutates
 def set_invalid_move_state(app_state):

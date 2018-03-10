@@ -17,7 +17,7 @@ def empty():
         [_EMPTY, _EMPTY, _EMPTY],
         [_EMPTY, _EMPTY, _EMPTY],
         [_EMPTY, _EMPTY, _EMPTY]
-    ], dtype = '<S5'))
+    ], dtype = 'S6'))
 
 def not_id(identifier):
     if identifier == X:   return O
