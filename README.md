@@ -11,7 +11,7 @@ This 2-day project was inspired by the classic work by Sutton and Barton (2012) 
 Assuming a package manager such as `pip`, the following dependencies are needed to run the CLI:
 
 ```bash
-pip install urwid tabulate funcy phi pyrsistent numpy
+pip install urwid urwid_timed_progress tabulate funcy phi pyrsistent numpy
 ```
 
 To run, simply call `python tic-tac-toe` from within the directory.
